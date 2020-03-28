@@ -1,0 +1,171 @@
+{
+    "schema": "envimodel_1.0",
+    "nodes": [
+        {
+            "envitask": {
+                "static_input": {
+                    "data_ignore_value": 0.00000000000000000,
+                    "expression": "byte((b1 lt 10)*0+(b1 ge 10)*b1)"
+                },
+                "revision": "1.1.0",
+                "name": "PixelwiseBandMathRaster"
+            },
+            "name": "task_1",
+            "location": [1362, 1590],
+            "display_name": "Band Math",
+            "type": "task"
+        },
+        {
+            "envitask": {
+                "static_input": {
+                    "data_ignore_value": 0.00000000000000000,
+                    "expression": "byte((b2 lt 10)*0+(b2 ge 10)*b2)"
+                },
+                "revision": "1.1.0",
+                "name": "PixelwiseBandMathRaster"
+            },
+            "name": "task_2",
+            "location": [1356, 1498],
+            "display_name": "Band Math",
+            "type": "task"
+        },
+        {
+            "envitask": {
+                "static_input": {
+                    "data_ignore_value": 0.00000000000000000,
+                    "expression": "byte((b3 lt 10)*0+(b3 ge 10)*b3)"
+                },
+                "revision": "1.1.0",
+                "name": "PixelwiseBandMathRaster"
+            },
+            "name": "task_3",
+            "location": [1359, 1410],
+            "display_name": "Band Math",
+            "type": "task"
+        },
+        {
+            "name": "aggregator_1",
+            "location": [1545, 1491],
+            "display_name": "Aggregator",
+            "extract": 1,
+            "type": "aggregator",
+            "revision": "1.0.0"
+        },
+        {
+            "envitask": {
+                "static_input": {
+                    "resampling": "Cubic Convolution"
+                },
+                "revision": "1.0.1",
+                "name": "BuildLayerStack"
+            },
+            "name": "task_4",
+            "location": [1585, 1356],
+            "display_name": "Build Layer Stack",
+            "type": "task"
+        },
+        {
+            "name": "iterator_1",
+            "location": [1091, 1525],
+            "display_name": "Iterator",
+            "type": "iterator",
+            "revision": "1.0.0"
+        },
+        {
+            "name": "parameters_1",
+            "location": [936, 1498],
+            "display_name": "Input Parameters",
+            "type": "inputparameters",
+            "parameters": [
+                {
+                    "name": "INPUT_RASTER",
+                    "type": "ENVIRASTERARRAY",
+                    "display_name": "Input Raster",
+                    "description": "Specify an input raster to process."
+                },
+                {
+                    "name": "OUTPUT_PATH",
+                    "type": "ENVIURI",
+                    "display_name": "Output Directory",
+                    "description": "Specific the output directory."
+                }
+            ]
+        },
+        {
+            "envitask": {
+                "static_input": {
+                    "file_extension": "_stack.dat",
+                    "delete_exist": false
+                },
+                "revision": "1.0.0",
+                "name": "Generate_Output_Filename"
+            },
+            "name": "task_5",
+            "location": [1370, 1256],
+            "display_name": "Generate Output Filename",
+            "type": "task"
+        }
+    ],
+    "edges": [
+        {
+            "from_node": "task_1",
+            "from_parameters": ["output_raster"],
+            "to_node": "aggregator_1",
+            "to_parameters": [""]
+        },
+        {
+            "from_node": "task_2",
+            "from_parameters": ["output_raster"],
+            "to_node": "aggregator_1",
+            "to_parameters": [""]
+        },
+        {
+            "from_node": "task_3",
+            "from_parameters": ["output_raster"],
+            "to_node": "aggregator_1",
+            "to_parameters": [""]
+        },
+        {
+            "from_node": "aggregator_1",
+            "from_parameters": ["output"],
+            "to_node": "task_4",
+            "to_parameters": ["input_rasters"]
+        },
+        {
+            "from_node": "iterator_1",
+            "from_parameters": [""],
+            "to_node": "task_1",
+            "to_parameters": ["input_raster"]
+        },
+        {
+            "from_node": "iterator_1",
+            "from_parameters": [""],
+            "to_node": "task_2",
+            "to_parameters": ["input_raster"]
+        },
+        {
+            "from_node": "iterator_1",
+            "from_parameters": [""],
+            "to_node": "task_3",
+            "to_parameters": ["input_raster"]
+        },
+        {
+            "from_node": "parameters_1",
+            "from_parameters": ["input_raster"],
+            "to_node": "iterator_1",
+            "to_parameters": [""]
+        },
+        {
+            "from_node": "task_4",
+            "from_parameters": ["output_raster"],
+            "to_node": "task_5",
+            "to_parameters": ["input_raster"]
+        },
+        {
+            "from_node": "parameters_1",
+            "from_parameters": ["output_path"],
+            "to_node": "task_5",
+            "to_parameters": ["output_path"]
+        }
+    ]
+}
