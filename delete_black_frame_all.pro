@@ -53,8 +53,24 @@ pro delete_black_frame_all
   ; --------
   ; Iterator
   ; --------
+  CATCH, error_status
   foreach iterator_1, parameters_1.input_raster, iterator_1_index do begin
+    
+    print,'开始'+systime()
 
+    filename=STRMID(iterator_1.URI,0,STRLEN(iterator_1.URI)-4)
+    basename=FILE_BASENAME(filename)
+    resname=parameters_1.output_path+basename+'_stack.dat'
+    IF error_status NE 0 THEN BEGIN
+      tmp = DIALOG_MESSAGE('文件：'+resname+'，处理失败!',/info)
+      RETURN
+    ENDIF
+    
+    ;开始匀色
+    IF (FILE_TEST(resname) EQ 1) THEN BEGIN
+      CONTINUE
+    ENDIF
+    
     aggregator_1 = Dictionary()
     aggregator_1.output = !null
     list_aggregator_1 = List()
@@ -64,7 +80,6 @@ pro delete_black_frame_all
     task_3 = ENVITask('PixelwiseBandMathRaster')
     task_3.input_raster = iterator_1
     task_3.expression = 'byte((b3 lt 10)*0+(b3 ge 10)*b3)'
-    task_3.data_ignore_value = 0.0
     task_3.Execute
 
     ; ---------
@@ -73,7 +88,6 @@ pro delete_black_frame_all
     task_2 = ENVITask('PixelwiseBandMathRaster')
     task_2.input_raster = iterator_1
     task_2.expression = 'byte((b2 lt 10)*0+(b2 ge 10)*b2)'
-    task_2.data_ignore_value = 0.0
     task_2.Execute
 
     ; ---------
@@ -82,7 +96,6 @@ pro delete_black_frame_all
     task_1 = ENVITask('PixelwiseBandMathRaster')
     task_1.input_raster = iterator_1
     task_1.expression = 'byte((b1 lt 10)*0+(b1 ge 10)*b1)'
-    task_1.data_ignore_value = 0.0
     task_1.Execute
 
     ; ----------
@@ -93,19 +106,14 @@ pro delete_black_frame_all
     list_aggregator_1.Add, task_3.output_raster, /EXTRACT
     aggregator_1.output = list_aggregator_1
 
-    filename=STRMID(iterator_1.URI,0,STRLEN(iterator_1.URI)-4)
-    basename=FILE_BASENAME(filename)
-    resname=parameters_1.output_path+basename+'_stack.dat'
-    print,"处理："+resname
-
     ; -----------------
     ; Build Layer Stack
     ; -----------------
-    task_4 = ENVITask('BuildLayerStack')
+    task_4 = ENVITask('BuildBandStack')
     task_4.input_rasters = aggregator_1.output
-    task_4.resampling = 'Cubic Convolution'
     task_4.output_raster_uri = resname
     task_4.Execute
+    print,'完成'+systime()
 
   endforeach
 
